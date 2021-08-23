@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Tendermint Toolkit</title>
+		<style>
+			body {
+				margin: 2rem;
+				padding: 0;
+			}
+
+			textarea {
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Tendermint Toolkit</h1>
+		<h2>Block Results Parser</h2>
+		<div>
+			Copy&amp;paste the result from <code>/block_results</code>:
+			<textarea id="block-results__input" rows="20"></textarea>
+			<button onclick="parseBlockResults()">Parse</button>
+			<details>
+				<summary>Tx Results</summary>
+				<textarea id="block-results__tx-results" rows="15" readonly></textarea>
+			</details>
+			<details>
+				<summary>Begin Block Events</summary>
+				<textarea id="block-results__begin-block-events" rows="15" readonly></textarea>
+			</details>
+			<details>
+				<summary>End Block Events</summary>
+				<textarea id="block-results__end-block-events" rows="15" readonly></textarea>
+			</details>
+		</div>
+		<script>
+			function parseBlockResults() {
+				const blockResults = JSON.parse(document.getElementById('block-results__input').value);
+				
+				const txResults = blockResults.result.txs_results.map(({ events }) => ({ events: events.map(transformEvent) }));
+				const beginBlockEvents = blockResults.result.begin_block_events.map(transformEvent);
+				const endBlockEvents = blockResults.result.end_block_events.map(transformEvent);
+
+				document.getElementById('block-results__tx-results').value = JSON.stringify(txResults, null, 2);
+				document.getElementById('block-results__begin-block-events').value = JSON.stringify(beginBlockEvents, null, 2);
+				document.getElementById('block-results__end-block-events').value = JSON.stringify(endBlockEvents, null, 2);
+			}
+
+			function transformEvent(event) {
+				const { type, attributes } = event;
+				return {
+					type,
+					attributes: attributes.map(({ key, value, index }) => ({
+						key: atob(key),
+						value: atob(value),
+						index,
+					})),
+				};
+			}
+		</script>
+	</body>
+</html>

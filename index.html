@@ -33,6 +33,13 @@
         <textarea id="block-results__end-block-events" rows="15" readonly></textarea>
       </details>
     </div>
+    <h2>Event Parser</h2>
+    <div>
+      Copy&amp;paste the events:
+      <textarea id="events__input" rows="20"></textarea>
+      <button onclick="parseEvents()">Parse</button>
+      <textarea id="events__result" rows="10"></textarea>
+    </div>
     <script>
       function parseBlockResults() {
         const blockResults = JSON.parse(document.getElementById('block-results__input').value);
@@ -44,6 +51,14 @@
         document.getElementById('block-results__tx-results').value = JSON.stringify(txResults, null, 2);
         document.getElementById('block-results__begin-block-events').value = JSON.stringify(beginBlockEvents, null, 2);
         document.getElementById('block-results__end-block-events').value = JSON.stringify(endBlockEvents, null, 2);
+      }
+
+      function parseEvents() {
+        const events = JSON.parse(document.getElementById('events__input').value);
+
+        const result = events.map(transformEvent);
+
+        document.getElementById('events__result').value = JSON.stringify(result, null, 2);
       }
 
       function transformEvent(event) {
